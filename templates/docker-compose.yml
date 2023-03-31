@@ -1,0 +1,39 @@
+version: "3"
+
+services:
+  css:
+    command: yarn build:css --watch
+    image: APP_NAME_web
+    tty: true
+    volumes:
+      - .:/app
+  db:
+    environment:
+      - POSTGRES_PASSWORD=password
+    image: postgres:13
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data
+  js:
+    command: yarn build --watch
+    image: APP_NAME_web
+    tty: true
+    volumes:
+      - .:/app
+  web:
+    build: .
+    depends_on:
+      - db
+    environment:
+      - BUNDLE_PATH=/bundle/vendor
+    image: APP_NAME_web
+    ports:
+      - 3000:3000
+    volumes:
+      - bundler-data:/bundle
+      - .:/app
+    stdin_open: true
+    tty: true
+
+volumes:
+  bundler-data:
+  postgresql-data:
